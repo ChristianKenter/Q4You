@@ -36,6 +36,17 @@ jobs:
           distribution: temurin
           cache: maven
 
+      # Validate authentication secret before building
+      - name: Validate authentication configuration
+        env:
+          SECRET_KEY: ${{ secrets.APP_SECRET_KEY }}
+        run: |
+          if [ -z "$SECRET_KEY" ]; then
+            echo "::error::APP_SECRET_KEY is missing"
+            exit 1
+          fi
+          echo "Authentication configuration is present."
+
       - name: Build application
         run: mvn --batch-mode package -DskipTests
 
