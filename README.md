@@ -11,7 +11,7 @@ Deployed application:
 <https://q4you.christiankenter.com>
 
 Source code repository:  
-<https://github.com/ChristianKenter/Q4You>
+<https://github.com/ChristianKenter/Q4You.git>
 
 Portfolio website:  
 <https://portfolio.christiankenter.com>

@@ -69,6 +69,15 @@ jobs:
           exit 1
 
       - name: Run tests
+        env:
+          DEPLOYED: "true"
+          DB_NAME: myOllamma
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+          CONNECTION_STR: jdbc:postgresql://localhost:5432/
+          ISSUER: MyOllama
+          TOKEN_EXPIRE_TIME: "1800000"
+          SECRET_KEY: ${{ secrets.APP_SECRET_KEY }}
         run: mvn --batch-mode test
 
       - name: Upload application logs on failure
