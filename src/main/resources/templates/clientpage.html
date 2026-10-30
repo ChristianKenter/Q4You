@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+
+<input type="text" id="category" placeholder="Enter category" required>
+<button onclick="generateVideo()">Generate video</button>
+
+<p id="status"></p>
+<video id="video" controls width="640" hidden></video>
+
+<script>
+    async function generateVideo() {
+        const category = document.getElementById("category").value;
+        const status = document.getElementById("status");
+        const video = document.getElementById("video");
+
+        if (!category.trim()) {
+            status.textContent = "Enter a category.";
+            return;
+        }
+
+        status.textContent = "Generating video...";
+
+        try {
+            const response = await fetch("/video/generate-video", {
+                method: "POST",
+                headers: {"Content-Type": "application/x-www-form-urlencoded"},
+                body: new URLSearchParams({ category })
+            });
+
+            if (!response.ok) throw new Error("Generation failed");
+
+            const blob = await response.blob();
+            video.src = URL.createObjectURL(blob);
+            video.hidden = false;
+            video.load();
+        } catch (error) {
+            status.textContent = error.message;
+        }
+    }
+</script>
+
+</body>
+</html>

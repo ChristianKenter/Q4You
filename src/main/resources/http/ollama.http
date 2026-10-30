@@ -1,0 +1,64 @@
+
+###Ollama
+POST {{ollama_url}}/generate
+Content-Type: application/json
+
+{
+  "model": "qwen2.5:3b",
+  "prompt": "Generate exactly one factual multiple-choice quiz question about category. The question must be about SPORTS, not another subject. Write exactly four answer options labeled A., B., C., and D., each on its own line.",
+  "stream": false
+}
+
+###Kokoro
+POST {{kokoro_url}}/tts
+Content-Type: application/json
+
+{
+  "text": "This is an audio test"
+}
+
+
+### FFmpeg
+POST {{ffmpeg_url}}/create
+Content-Type: application/json
+
+{
+  "files": [
+    {
+      "fileName": "test.wav",
+      "data": "PASTE_THE_COPIED_BASE64_HERE"
+    }
+  ],
+  "instructions": [
+    "-i",
+    "\u007B\u007Binput:0\u007D\u007D",
+    "-c:a",
+    "aac",
+    "-b:a",
+    "128k",
+    "-y",
+    "\u007B\u007Boutput\u007D\u007D"
+  ]
+}
+
+### Login
+POST {{Q4You}}/client/login
+Content-Type: application/json
+
+{
+  "clientName": "Henrik",
+  "clientPassword": "1234"
+}
+
+### Generate Video
+POST {{Q4You}}/video/generate-video
+Content-Type: application/json
+Authorization: Bearer {{Q4You_token}}
+
+{
+  "category": "SPORTS"
+}
+
+
+
+

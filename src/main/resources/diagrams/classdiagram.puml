@@ -1,0 +1,238 @@
+@startuml
+title Quiz Video Generator - Class Diagram
+
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam linetype ortho
+hide empty members
+
+package "Application & Routes" {
+    class Main {
+        +main(args: String[]): void
+    }
+
+    class Routes {
+        +getRoutes(config: JavalinConfig): void
+    }
+
+    class ClientRoutes {
+        +getRoutes(config: JavalinConfig): void
+    }
+
+    class WebsiteRoutes {
+        +getRoutes(config: JavalinConfig): void
+    }
+
+    class SecurityRoutes {
+        +getRoutes(config: JavalinConfig): void
+    }
+
+    class VideoRoutes {
+        +getRoutes(config: JavalinConfig): void
+    }
+}
+
+package "Controllers" {
+    class ClientController {
+        -clientDAO: ClientDAO
+        -securityController: SecurityController
+        +login(ctx: Context): void
+        +register(ctx: Context): void
+        +logout(ctx: Context): void
+        +create(ctx: Context): void
+        +read(ctx: Context): void
+        +update(ctx: Context): void
+        +delete(ctx: Context): void
+    }
+
+    class VideoController {
+        +create(ctx: Context): void
+        +read(ctx: Context): void
+        +update(ctx: Context): void
+        +delete(ctx: Context): void
+    }
+
+    class SecurityController {
+        -objectMapper: ObjectMapper
+        -securityDAO: ISecurityDAO
+        +getInstance(): SecurityController
+        +login(ctx: Context): void
+        +register(ctx: Context): void
+        +authenticate(ctx: Context): void
+        +authorize(ctx: Context): void
+        +createToken(client: Client): String
+        -verifyToken(token: String): UserDTO
+    }
+}
+
+package "DAO & Security" {
+    class ClientDAO {
+        -emf: EntityManagerFactory
+        +findClient(name: String, password: String): Client
+        +createClient(name: String, password: String): Client
+    }
+
+    interface ISecurityDAO {
+        +getVerifiedUser(name: String, password: String): Client
+        +createUser(name: String, password: String): Client
+    }
+
+    class SecurityDAO {
+        -emf: EntityManagerFactory
+        +getVerifiedUser(name: String, password: String): Client
+        +createUser(name: String, password: String): Client
+    }
+
+    enum Roles {
+        ANYONE
+        STANDARD
+        PREMIUM
+    }
+}
+
+package "Services" {
+    class OllamaService {
+        -om: ObjectMapper
+        +ollamaAPI(prompt: String): OllamaDTO
+    }
+
+    class KokoroService {
+        -om: ObjectMapper
+        +kokoroAPI(text: String): byte[]
+    }
+
+    class ResourceService {
+        -API(path: String, file: String): byte[]
+        +imageAPI(file: String): byte[]
+        +backgroundMusicAPI(file: String): byte[]
+        +countdownAPI(file: String): byte[]
+        +whooshAPI(file: String): byte[]
+    }
+
+    class FFmpegService {
+        -om: ObjectMapper
+        +ffmpegAPI(request: VideoRequest): byte[]
+    }
+}
+
+package "Video Generation" {
+    class QuizVideoRenderer {
+        +render(...): byte[]
+    }
+
+    class VideoInstruction {
+        -question: String
+        -options: List<String>
+        -answer: String
+        +parseCaption(response: OllamaDTO): void
+        +instruction(): List<String>
+        +createQuestionOverlay(): byte[]
+        +createCountdownOverlay(): byte[]
+        +createAnswerOverlay(): byte[]
+        -transparentImage(): BufferedImage
+        -toPng(image: BufferedImage): byte[]
+    }
+
+    class VideoRequest {
+        -files: List<VideoFile>
+        -instructions: List<String>
+        +getFiles(): List<VideoFile>
+        +getInstructions(): List<String>
+    }
+
+    class VideoFile {
+        -name: String
+        -type: String
+        -fileName: String
+        -data: byte[]
+        +getName(): String
+        +getType(): String
+        +getFileName(): String
+        +getData(): byte[]
+    }
+}
+
+package "Database Entities" {
+    class Client {
+        -userId: int
+        -clientName: String
+        -clientPassword: String
+        -clientRole: String
+        -videos: List<Video>
+    }
+
+    class Video {
+        -videoId: int
+        -topic: String
+        -createdAt: LocalDateTime
+        -createdBy: Client
+    }
+}
+
+package "DTOs" {
+    class ClientDTO {
+        -clientName: String
+        -clientPassword: String
+    }
+
+    class OllamaDTO {
+        -response: String
+        +getQuestion(): String
+        +getAnswer(): String
+        +getOptions(): List<String>
+    }
+
+    class KokoroDTO {
+        -wav: byte[]
+    }
+
+    class ResourceDTO {
+        -file: byte[]
+    }
+
+    class VideoDTO {
+        -mp4: byte[]
+    }
+}
+
+' Application and routing
+Main --> Routes
+Routes --> ClientRoutes
+Routes --> WebsiteRoutes
+Routes --> SecurityRoutes
+Routes --> VideoRoutes
+
+ClientRoutes --> ClientController
+SecurityRoutes --> SecurityController
+VideoRoutes --> VideoController
+
+' Controller dependencies
+ClientController --> ClientDAO
+ClientController --> SecurityController
+VideoController ..> OllamaService
+VideoController ..> KokoroService
+VideoController ..> ResourceService
+VideoController ..> QuizVideoRenderer
+
+' DAO and security
+ClientDAO --> Client
+SecurityDAO ..|> ISecurityDAO
+SecurityController --> ISecurityDAO
+SecurityController --> Roles
+SecurityDAO --> Client
+
+' Video generation dependencies
+QuizVideoRenderer --> VideoInstruction
+QuizVideoRenderer --> FFmpegService
+VideoInstruction --> OllamaDTO
+OllamaService --> OllamaDTO
+KokoroService --> KokoroDTO
+ResourceService --> ResourceDTO
+FFmpegService --> VideoRequest
+FFmpegService --> VideoDTO
+
+' Object associations
+Client "1" -- "0..*" Video : owns
+VideoRequest "1" *-- "1..*" VideoFile : contains
+
+@enduml
