@@ -14,13 +14,13 @@ jobs:
       postgres:
         image: postgres:16
         env:
-          POSTGRES_DB: myOllamma
+          POSTGRES_DB: q4you
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U postgres -d myOllamma"
+          --health-cmd "pg_isready -U postgres -d q4you"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -53,11 +53,11 @@ jobs:
       - name: Start application
         env:
           DEPLOYED: "true"
-          DB_NAME: myOllamma
-          DB_USERNAME: postgres
-          DB_PASSWORD: postgres
-          CONNECTION_STR: jdbc:postgresql://localhost:5432/
-          ISSUER: MyOllama
+          JDBC_DB: q4you
+          JDBC_USER: postgres
+          JDBC_PASSWORD: postgres
+          JDBC_CONNECTION_STRING: jdbc:postgresql://localhost:5432/%s?currentSchema=public
+          ISSUER: q4you
           TOKEN_EXPIRE_TIME: "1800000"
           SECRET_KEY: ${{ secrets.APP_SECRET_KEY }}
         run: |
@@ -82,11 +82,11 @@ jobs:
       - name: Run tests
         env:
           DEPLOYED: "true"
-          DB_NAME: myOllamma
-          DB_USERNAME: postgres
-          DB_PASSWORD: postgres
-          CONNECTION_STR: jdbc:postgresql://localhost:5432/
-          ISSUER: MyOllama
+          JDBC_DB: q4you
+          JDBC_USER: postgres
+          JDBC_PASSWORD: postgres
+          JDBC_CONNECTION_STRING: jdbc:postgresql://localhost:5432/%s?currentSchema=public
+          ISSUER: q4you
           TOKEN_EXPIRE_TIME: "1800000"
           SECRET_KEY: ${{ secrets.APP_SECRET_KEY }}
         run: mvn --batch-mode test
