@@ -2,16 +2,20 @@ package app.routes;
 
 import app.controllers.impl.VideoController;
 import app.security.Roles;
-import io.javalin.config.JavalinConfig;
+import io.javalin.apibuilder.EndpointGroup;
+
+import static io.javalin.apibuilder.ApiBuilder.post;
+import static io.javalin.apibuilder.ApiBuilder.put;
 
 public class VideoRoutes {
 
     private final VideoController videoController = new VideoController();
 
-    public void getRoutes(JavalinConfig config) {
-        config.routes.post("/video/generate-video", videoController::create, Roles.STANDARD);
-        config.routes.get("/video/read", videoController::read, Roles.STANDARD);
-        config.routes.put("/video/update", videoController::update, Roles.STANDARD);
-        config.routes.delete("/video/delete", videoController::delete, Roles.STANDARD);
+    protected EndpointGroup getRoutes() {
+        return () -> {
+            post("/generate-video", videoController::create, Roles.STANDARD);
+            put("/update", videoController::update, Roles.STANDARD);
+            post("/delete", videoController::delete, Roles.STANDARD);
+        };
     }
 }

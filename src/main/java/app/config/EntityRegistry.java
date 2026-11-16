@@ -2,7 +2,6 @@ package app.config;
 
 import app.entities.Client;
 import app.entities.Video;
-
 import org.hibernate.cfg.Configuration;
 
 final class EntityRegistry {

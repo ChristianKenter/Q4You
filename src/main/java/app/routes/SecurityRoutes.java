@@ -2,16 +2,17 @@ package app.routes;
 
 import app.security.Roles;
 import app.security.controllers.SecurityController;
-import io.javalin.config.JavalinConfig;
+import io.javalin.apibuilder.EndpointGroup;
+
+import static io.javalin.apibuilder.ApiBuilder.post;
 
 public class SecurityRoutes {
-
     private final SecurityController securityController = SecurityController.getInstance();
 
-    public void getRoutes(JavalinConfig config) {
-        config.routes.get("/auth/login", ctx -> ctx.render("login.html"), Roles.ANYONE);
-        config.routes.post("/auth/login", securityController::login, Roles.ANYONE);
-        config.routes.get("/auth/register", ctx -> ctx.render("register.html"), Roles.ANYONE);
-        config.routes.post("/auth/register", securityController::register, Roles.ANYONE);
+    protected EndpointGroup getRoutes() {
+        return () -> {
+            post("/login", securityController::login, Roles.ANYONE);
+            post("/register", securityController::register, Roles.ANYONE);
+        };
     }
 }

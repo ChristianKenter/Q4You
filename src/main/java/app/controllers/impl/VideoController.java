@@ -32,7 +32,6 @@ public class VideoController implements IController {
 
         OllamaService ollamaService = new OllamaService();
         OllamaDTO ollamaResponse = ollamaService.ollamaAPI(prompt);
-        System.out.println(ollamaResponse);
 
         KokoroService kokoroService = new KokoroService();
         byte[] kokoroResponseQuestion = kokoroService.kokoroAPI(ollamaResponse.getQuestion());
